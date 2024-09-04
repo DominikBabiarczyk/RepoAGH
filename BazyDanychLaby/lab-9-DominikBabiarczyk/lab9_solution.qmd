@@ -1,0 +1,107 @@
+---
+title: "lab9_solution"
+format: html
+editor: visual
+---
+
+```{r}
+install.packages("RMySQL")
+library(RMySQL)
+```
+
+```{r}
+con <-dbConnect(MySQL(), user="babiarcz", password="GX8kdpTZALWJYhPw", port=3306, dbname="babiarcz", host="mysql.agh.edu.pl")
+
+
+#df2<-dbGetQuery(con, query)
+#print(df2)
+```
+
+```{r}
+
+createUsers <- "CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL
+);"
+
+createHosts <- "CREATE TABLE hosts(
+  id integer AUTO_INCREMENT PRIMARY KEY,
+  user_id integer, 
+  FOREIGN KEY(user_id) REFERENCES users(id)
+  );
+"
+createCountries <- "CREATE TABLE countries(
+  id integer AUTO_INCREMENT PRIMARY KEY,
+  country_code VARCHAR(255),
+  name varchar(255)
+  );
+"
+
+createReviews <- "CREATE TABLE reviews(
+  id integer AUTO_INCREMENT PRIMARY KEY,
+  booking_id integer, 
+  rating tinyint, 
+  review_body text
+);"
+
+createCities <- "CREATE TABLE cities(
+  id integer AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255),
+  country_id integer,
+  FOREIGN KEY(country_id) REFERENCES countries(id) 
+  );"
+  
+createPlaces <- "CREATE TABLE places(
+  id integer AUTO_INCREMENT PRIMARY KEY,
+  host_id integer, 
+  address VARCHAR(255),
+  city_id integer,
+  FOREIGN KEY(host_id) REFERENCES hosts(id)
+);"
+
+createBookings <- "CREATE TABLE bookings(
+  id integer AUTO_INCREMENT PRIMARY KEY,
+  user_id integer,
+  place_id integer,
+  start_date date,
+  end_date date,
+  price_per_night float,
+  num_nights integer,
+  FOREIGN KEY(user_id) REFERENCES users(id),
+  FOREIGN KEY(place_id) REFERENCES places(id)
+);"
+
+
+
+```
+
+```{r}
+dbExecute(con, createUsers)
+```
+
+```{r}
+dbExecute(con, createHosts)
+
+```
+
+```{r}
+dbExecute(con, createCountries)
+dbExecute(con, createReviews)
+dbExecute(con, createCities)
+
+```
+
+```{r}
+dbExecute(con, createPlaces)
+
+```
+
+```{r}
+dbExecute(con, createBookings)
+```
+
+```{r}
+query <- "SELECT * FROM hosts"
+table <- dbGetQuery(con, query)
+print(table)
+```

@@ -1,0 +1,135 @@
+---
+title: "lab6"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+library(DBI)
+library(dplyr)
+```
+
+1.  Korzystając z dokumentacji pakietu i podglądając zawartość tabeli opisać co znaczą wszystkie zmienne oraz jakich są typów. Wyjaśnić też co oznaczają poszczególne kody.
+
+```{r}
+
+flights <- nycflights13::flights
+glimpse(flights)
+
+
+```
+
+-   year - typ: int - rok lotu
+
+-   month - typ: int - miesiąc lotu
+
+-   day - typ: int - dzień lotu
+
+-   dep_time - typ: int - rzeczywisty czas odlotu
+
+-   sched_dep_time - typ: int - planowany czas odlotu
+
+-   dep_delay - typ: double - opóźnienie
+
+-   arr_time - typ: int - czas przylotu
+
+-   asched_arr_time - typ: int - planowany czas przylotu
+
+-   carrier - typ: char - przewoźnik
+
+-   flight - typ: int - numer lotu
+
+-   tailnum - typ: char - numer samolotu
+
+-   origin - typ: char - miejsce wylotu
+
+-   dest - typ: char - cel podróży
+
+-   ari_time - typ: double - czas w powietrzu
+
+-   dsitance - typ: double - dystans
+
+-   hour - typ: double - godziny wylotu
+
+-   minute - typ: double - minuta wylotu
+
+-   time_hour - typ: DataTime - planowana data i godzina lotu
+
+1.  Za pomocą pojedynczego pipelina na każdy warunek, znajdź wszystkie loty, które:
+    -   Miały opóźnienie o co najmniej 2 godziny.
+    -   Leciały do Huston (IAH lub HOU)
+    -   Były z lini lotniczych United, American, lub Delta
+    -   Wylatywały w lecie (Lipiec, Sierpień, Wrzesień)
+    -   Miały opóźnienie o co najmniej dwie godziny ale nie miały opóźnienia odlotu.
+    -   Miały co najmniej godzinę opóźnienia ale odrobiły ponad 30 minut w trakcie lotu.
+    -   Posortuj loty by znaleźć loty z najdłuższym opóźnieniem odlotu. Znajdź loty, który odlatywały najwcześniej rano.
+
+```{r}
+flights |> filter(dep_delay >= 2) |> print()
+```
+
+```{r}
+flights |> filter(dest == 'IAH' | dest == 'HOU') |> print()
+```
+
+```{r}
+flights |> filter(carrier == 'UA' | carrier == 'AA' | carrier == 'DL') |> print()
+```
+
+```{r}
+flights |> filter(month == 7 | month == 8 | month == 9) |> print()
+```
+
+```{r}
+flights |> filter(dep_delay >= 120 & ((sched_dep_time - dep_time) < 1)) |> print()
+```
+
+```{r}
+flights |> filter(dep_delay >= 60 & ((
+  as.POSIXct(sprintf("%04d", sched_arr_time), format = "%H%M")-
+    as.POSIXct(sprintf("%04d", sched_dep_time), format = "%H%M"))-
+    ( as.POSIXct(sprintf("%04d", arr_time), format = "%H%M")-
+        as.POSIXct(sprintf("%04d", dep_time), format = "%H%M"))) > 30) |> print()
+```
+
+```{r}
+flights |> filter(hour < 10) |> arrange(desc(dep_delay)) |> print()
+```
+
+1.  Posortuj loty by znaleźć najszybsze połączenia. Wskazówka: Wykorzystać obliczenia matematyczne wewnątrz funkcji.
+
+```{r}
+flights |> arrange(as.POSIXct(sprintf("%04d", sched_arr_time), format = "%H%M") - as.POSIXct(sprintf("%04d", sched_dep_time), format = "%H%M")) |> print()
+```
+
+1.  Czy każdego dnia 2013 odbył się co najmniej jeden lot?
+
+    ```{r}
+    number_day <- flights |> filter(year == 2013) |> distinct(month, day) |> count() |> print()
+    if( number_day >= 365){
+      print("tak")
+    }else{
+      print("nie")
+    }
+    ```
+
+<!-- -->
+
+1.  Które loty pokonały największy dystans a które najkrótszy (top i bottom 10)
+
+```{r}
+flights |> arrange(desc(distance)) |> slice_head(n = 10) |> print()
+flights |> arrange(distance) |> slice_head(n = 10) |> print()
+```
+
+1.  Czy kolejność używania `filter()` i `arrange()` ma znaczenie jeśli używasz obydwu? Dlaczego tak/nie? Weź pod uwagę zarówno rezultaty jak też i zużycie zasobów.
+
+```{r}
+flights |> filter(distance ==  4983 | distance == 17) |> arrange(distance) |> print()
+
+flights |>  arrange(distance) |> filter(distance ==  4983 | distance == 17)  |> print()
+```
+
+Rezultaty są takie same jednak szybszy jest najpierw filtrowanie a następnie sortowanie ponieważ nie sorturjemy tak dużej bazy

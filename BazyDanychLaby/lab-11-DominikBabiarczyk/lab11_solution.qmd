@@ -1,0 +1,382 @@
+---
+title: "lab11_solution"
+format: html
+editor: visual
+---
+
+```{r}
+library(readxl)
+# Przykładowa ścieżka do pliku Excela
+sciezka_do_pliku <- "beauty.csv"
+
+# Zaimportuj dane z arkusza "Sheet1"
+data <- read.csv(sciezka_do_pliku)
+
+data$class <- NA
+
+sameCalss <- data[,18:48];
+
+
+for (i in 1:nrow(data)){
+  col_index <- which(data[i,18:47] == 1)
+  
+  
+  if(length(col_index) == 1){
+    data$class[i] = col_index
+  }else if(length(col_index) > 1){
+    data$class[i] = "more 1"
+  }
+}
+
+data <- data[,-c(18:47)]
+```
+
+## Zadanie 1
+
+Po przekształceniu zmiennej klass z 30 wartości binarnych na jedą zmienną dane są poprawne i można z nich korzystać do analizy
+
+## Zadanie 2
+
+```{r}
+# Przykładowe dane
+courseRating <- data$courseevaluation
+profRating <- data$profevaluation
+
+# Przeprowadź test korelacji Pearsona
+test_korelacji <- cor.test(courseRating, profRating, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(courseRating - profRating)
+print(mean(diverentialRating))
+
+```
+
+Wartość korelacji jest prawie równa 1 co wskazuje na duże powiązanie między zmiennymi, ponad to śradnia z różnicy wartości bezwględnych ocen jest nieznacznie większa od 0 co wskazuje że oceny kursu i profesora są podobne.
+
+```{r}
+malecourseRating <- subset(data, female==0)$courseevaluation
+maleprofRating <- subset(data, female==0)$profevaluation
+
+femaleCourse <- subset(data, female==1)$courseevaluation
+femaleProfRating <- subset(data, female==1)$profevaluation
+
+# Przeprowadź test korelacji Pearsona
+test_korelacjiMale <- cor.test(malecourseRating, maleprofRating, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacjiMale)
+
+diverentialRatingMale <- abs(femaleCourse - femaleProfRating)
+print(mean(diverentialRatingMale))
+
+
+
+test_korelacjiFemale <- cor.test(femaleCourse, femaleProfRating, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacjiFemale)
+
+diverentialRatingFemale <- abs(femaleCourse - femaleProfRating)
+print(mean(diverentialRatingFemale))
+```
+
+Zarówno dla kobiet jak i dla męszczyzn istnieje duży wpływ oceny prowadzącego na ocenę kursu. W przypadku męszczyzn wpływ jest niezancznie większy
+
+```{r}
+TenuredProfCourseRating <- subset(data, tenured==1)$courseevaluation
+TenuredProfRating <- subset(data, tenured == 1)$profevaluation
+
+UnTenuredProfCourseRating <- subset(data, tenured==0)$courseevaluation
+UnTenuredPfofRating <- subset(data, tenured==0)$profevaluation
+
+
+test_korelacji <- cor.test(TenuredProfCourseRating, TenuredProfRating, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(TenuredProfCourseRating - TenuredProfRating)
+print(mean(diverentialRating))
+
+
+
+test_korelacji <- cor.test(UnTenuredProfCourseRating, UnTenuredPfofRating, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(UnTenuredProfCourseRating - UnTenuredPfofRating)
+print(mean(diverentialRating))
+
+```
+
+Jeśli profesor jest doświaczony jego wpływ na ocenę kursu jest większy
+
+```{r}
+MiniorityCourseRating <- subset(data, minority==1)$courseevaluation
+MiniorityProfRating <- subset(data, minority==1)$profevaluation
+
+MajorityCountryRating <- subset(data, minority==0)$courseevaluation
+MajorityProfRating <- subset(data, minority==0)$profevaluation
+
+test_korelacji <- cor.test(MiniorityCourseRating, MiniorityProfRating, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(MiniorityCourseRating - MiniorityProfRating)
+print(mean(diverentialRating))
+
+
+
+test_korelacji <- cor.test(MajorityCountryRating, MajorityProfRating, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(MajorityCountryRating - MajorityProfRating)
+print(mean(diverentialRating))
+```
+
+Jeśli profesor nie należy do mniejszości wówczaj jego ocena oraz ocena kursu mają większe powiązanie natomiast nie jest to bardzo duża różnica
+
+## Zadanie 3
+
+```{r}
+TheyJudgeWomen <- data[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper")]
+TheyJudgeMen <- data[,c("beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+meanTheyJudgeWomen <- rowMeans(TheyJudgeWomen)
+meanTheyJudgeMean <- rowMeans(TheyJudgeMen)
+
+print(mean(meanTheyJudgeWomen))
+print(mean(meanTheyJudgeMean))
+
+test_korelacji <- cor.test(meanTheyJudgeWomen, meanTheyJudgeMean, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(meanTheyJudgeWomen - meanTheyJudgeMean)
+print(mean(diverentialRating))
+```
+
+Istnieje duże powiązanie między ocenami kobiet i męszczyzn jednak mniejsze niż w poprzednich ćwiczeniach, kobiety lepiej oceniały urodę, średnia różnica w ocenie wynosi 0,74
+
+```{r}
+print("Female Professors")
+onlyFemaleProf <- subset(data, female==1);
+
+TheyJudgeWomen <- onlyFemaleProf[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper")]
+TheyJudgeMen <- onlyFemaleProf[,c("beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+meanTheyJudgeWomen <- rowMeans(TheyJudgeWomen)
+meanTheyJudgeMean <- rowMeans(TheyJudgeMen)
+
+print(paste("They Judge Women: ", mean(meanTheyJudgeWomen)))
+print(paste("They Judge Mean: ", mean(meanTheyJudgeMean)))
+
+test_korelacji <- cor.test(meanTheyJudgeWomen, meanTheyJudgeMean, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(meanTheyJudgeWomen - meanTheyJudgeMean)
+print(mean(diverentialRating))
+```
+
+```{r}
+
+print("Male Professors")
+onlyFemaleProf <- subset(data, female==0);
+
+TheyJudgeWomen <- onlyFemaleProf[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper")]
+TheyJudgeMen <- onlyFemaleProf[,c("beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+meanTheyJudgeWomen <- rowMeans(TheyJudgeWomen)
+meanTheyJudgeMean <- rowMeans(TheyJudgeMen)
+
+print(paste("They Judge Women: ", mean(meanTheyJudgeWomen)))
+print(paste("They Judge Mean: ", mean(meanTheyJudgeMean)))
+
+test_korelacji <- cor.test(meanTheyJudgeWomen, meanTheyJudgeMean, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(meanTheyJudgeWomen - meanTheyJudgeMean)
+print(mean(diverentialRating))
+```
+
+Zarówno kobiety jak i męszczyźni lepiej oceniali wygląd kobiet natomiast w przypadku oceniania przez kobiety ta różnica była większa, większa koleracja występuje w ocenie nauczycieli płci żeńskiej.
+
+```{r}
+print("Tenured Professors")
+onlyTenuredProf <- subset(data, tenured==1);
+
+TheyJudgeWomen <- onlyTenuredProf[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper")]
+TheyJudgeMen <- onlyTenuredProf[,c("beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+meanTheyJudgeWomen <- rowMeans(TheyJudgeWomen)
+meanTheyJudgeMean <- rowMeans(TheyJudgeMen)
+
+print(paste("They Judge Women: ", mean(meanTheyJudgeWomen)))
+print(paste("They Judge Mean: ", mean(meanTheyJudgeMean)))
+
+test_korelacji <- cor.test(meanTheyJudgeWomen, meanTheyJudgeMean, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(meanTheyJudgeWomen - meanTheyJudgeMean)
+print(mean(diverentialRating))
+```
+
+```{r}
+print("No Tenured Professors")
+onlyNoTenuredProf <- subset(data, tenured==0);
+
+TheyJudgeWomen <- onlyNoTenuredProf[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper")]
+TheyJudgeMen <- onlyNoTenuredProf[,c("beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+meanTheyJudgeWomen <- rowMeans(TheyJudgeWomen)
+meanTheyJudgeMean <- rowMeans(TheyJudgeMen)
+
+print(paste("They Judge Women: ", mean(meanTheyJudgeWomen)))
+print(paste("They Judge Mean: ", mean(meanTheyJudgeMean)))
+
+test_korelacji <- cor.test(meanTheyJudgeWomen, meanTheyJudgeMean, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(meanTheyJudgeWomen - meanTheyJudgeMean)
+print(mean(diverentialRating))
+```
+
+Kobiety jak i męszczyźni lepiej oceniali urodę nauczycieli niedoświadczonych. Większa zgodość w ocenie byłą również dla profesorów niedoświadczonych współczynnik korelacji dla nich wynosił 0,91, natomiast dla doświadczonych wyniki bardziej się różniły
+
+```{r}
+print("Minority")
+onlyMinorityProf <- subset(data, minority==1);
+
+TheyJudgeWomen <- onlyMinorityProf[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper")]
+TheyJudgeMen <- onlyMinorityProf[,c("beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+meanTheyJudgeWomen <- rowMeans(TheyJudgeWomen)
+meanTheyJudgeMean <- rowMeans(TheyJudgeMen)
+
+print(paste("They Judge Women: ", mean(meanTheyJudgeWomen)))
+print(paste("They Judge Mean: ", mean(meanTheyJudgeMean)))
+
+test_korelacji <- cor.test(meanTheyJudgeWomen, meanTheyJudgeMean, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(meanTheyJudgeWomen - meanTheyJudgeMean)
+print(mean(diverentialRating))
+```
+
+```{r}
+print("Majority")
+onlyMajorityProf <- subset(data, minority==0);
+
+TheyJudgeWomen <- onlyMajorityProf[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper")]
+TheyJudgeMen <- onlyMajorityProf[,c("beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+meanTheyJudgeWomen <- rowMeans(TheyJudgeWomen)
+meanTheyJudgeMean <- rowMeans(TheyJudgeMen)
+
+print(paste("They Judge Women: ", mean(meanTheyJudgeWomen)))
+print(paste("They Judge Mean: ", mean(meanTheyJudgeMean)))
+
+test_korelacji <- cor.test(meanTheyJudgeWomen, meanTheyJudgeMean, method = "pearson")
+
+# Wydrukuj wyniki
+print(test_korelacji)
+
+diverentialRating <- abs(meanTheyJudgeWomen - meanTheyJudgeMean)
+print(mean(diverentialRating))
+```
+
+Jeśli chodzi o mniejszość to nieznaczna różnica jest tylko w ocenie męszczyzn natomiast większa zgodność między oceną męszczyzn i kobiet jest dla mniejszości (oceny mniej się różniły).
+
+## Zadanie 4
+
+```{r}
+print("Age")
+
+RatingBeauty <- data[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper", "beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+MeanRatingBeauty <- rowMeans(RatingBeauty)
+AgeProf <- data$age
+
+test__korelacji <- cor.test(MeanRatingBeauty, AgeProf,method = "pearson")
+print(test__korelacji)
+```
+
+Wiek wpływana negatywnie na ocenę urody, Im większy wiek tym gorsze ocent urody jedak nie jest to tak znaczące jak doświadczenie, wspólczynnik korelacji wynosi -0,238
+
+## Zadanie 5
+
+```{r}
+AgeProf <- data$age
+RatingProf <- data$profevaluation
+RatingCourse <- data$courseevaluation
+
+test_korelacji <- cor.test(AgeProf, RatingProf, method = 'pearson')
+
+
+print(test__korelacji)
+
+test__korelacji <- cor.test(AgeProf, RatingCourse, method = 'pearson')
+print(test__korelacji)
+
+```
+
+Wiek wpływa negatywnie na ocenę profesora ale tylko w 24% natomiast wiek profesora nie ma wpływu na ocenę kursu
+
+## Zadanie 6
+
+```{r}
+RatingBeauty <- data[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper", "beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+MeanRatingBeauty <- rowMeans(RatingBeauty)
+
+
+RatingCourse <- data$courseevaluation
+test__korelacji <- cor.test(MeanRatingBeauty, RatingCourse, method = 'pearson')
+print(test__korelacji)
+```
+
+```{r}
+DataMulticlass <- subset(data, multipleclass==1) 
+
+RatingBeauty <- DataMulticlass[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper", "beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+MeanRatingBeauty <- rowMeans(RatingBeauty)
+
+
+RatingCourse <- DataMulticlass$courseevaluation
+test__korelacji <- cor.test(MeanRatingBeauty, RatingCourse, method = 'pearson')
+print(test__korelacji)
+
+
+
+
+DataNoMulticlass <- subset(data, multipleclass==0) 
+
+RatingBeauty <- DataNoMulticlass[,c("beautyf2upper", "beautyflowerdiv", "beautym2upper", "beautym2upper", "beautymlowerdiv", "beautymupperdiv")]
+
+MeanRatingBeauty <- rowMeans(RatingBeauty)
+
+
+RatingCourse <- DataNoMulticlass$courseevaluation
+test__korelacji <- cor.test(MeanRatingBeauty, RatingCourse, method = 'pearson')
+print(test__korelacji)
+```
+
+Przynależność do grup nie ma większego znaczenia przy ocenie urody nauczyciela.

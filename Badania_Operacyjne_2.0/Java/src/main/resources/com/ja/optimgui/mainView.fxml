@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#anchorPaneCLicked" prefHeight="654.0" prefWidth="929.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ja.optimgui.MainViewController">
+   <children>
+      <TabPane layoutX="304.0" prefHeight="654.0" prefWidth="625.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab fx:id="dataInputTab" text="Dane">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="496.0" prefWidth="481.0">
+                     <children>
+                        <Label layoutX="52.0" layoutY="54.0" text="Zapotrzebowanie " />
+                        <ListView fx:id="prodListView" layoutY="71.0" prefHeight="52.0" prefWidth="197.0" />
+                        <ListView fx:id="storageListView" layoutX="216.0" layoutY="71.0" prefHeight="52.0" prefWidth="191.0" />
+                        <Label layoutX="248.0" layoutY="54.0" text="Koszt magazynowania" />
+                        <ListView fx:id="penaltyListView" layoutX="422.0" layoutY="71.0" prefHeight="52.0" prefWidth="191.0" />
+                        <Label layoutX="422.0" layoutY="54.0" text="Kara za niezaładowanie ciężarówki" />
+                        <TableView fx:id="prodTable" layoutX="31.0" layoutY="158.0" prefHeight="282.0" prefWidth="447.0">
+                          <columns>
+                            <TableColumn fx:id="prodTableDayCol" prefWidth="75.0" text="Dzień" />
+                            <TableColumn fx:id="prodTableNeedCol" prefWidth="112.0" text="Zapotrzebowanie" />
+                              <TableColumn fx:id="prodTableTruckPenaltyCol" prefWidth="137.0" text="Kara za brak ciężarówki" />
+                              <TableColumn fx:id="prodTableOptionsCol" prefWidth="75.0" text="Opcje" />
+                          </columns>
+                        </TableView>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="prodOutputTab" text="Produkcja">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+            <Tab fx:id="reportTab" text="Raport">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <LineChart layoutX="57.0" layoutY="40.0" prefHeight="333.0" prefWidth="512.0">
+                          <xAxis>
+                            <CategoryAxis side="BOTTOM" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis side="LEFT" />
+                          </yAxis>
+                        </LineChart>
+                     </children></AnchorPane>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+      <Label layoutX="27.0" layoutY="22.0" prefHeight="110.0" prefWidth="255.0" text="Wyznaczanie produkcji algorytmem rojowym" wrapText="true">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="26.0" layoutY="125.0" text="Ustawienia algorytmu:">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <Label layoutX="27.0" layoutY="171.0" text="Rozmiar stada" />
+      <TextField fx:id="swarmSizeBox" layoutX="28.0" layoutY="188.0" onKeyPressed="#swarmSizeBoxKeyPressed" prefHeight="25.0" prefWidth="75.0" />
+      <Label layoutX="27.0" layoutY="213.0" text="Ilość cząstek" />
+      <Label layoutX="27.0" layoutY="245.0" text="Bezwładność" />
+      <TextField fx:id="inertiaBox" layoutX="28.0" layoutY="262.0" onKeyPressed="#inertiaBoxKeyPressed" prefHeight="25.0" prefWidth="75.0" />
+      <Label layoutX="28.0" layoutY="287.0" text="Określa jak bardzo cząstka zachowuje prędkość" />
+      <Slider fx:id="inertiaSlider" layoutX="111.0" layoutY="268.0" majorTickUnit="5.0" max="1.0" />
+      <Label layoutX="27.0" layoutY="319.0" text="Współczynnik poznawczy" />
+      <TextField fx:id="c1Box" layoutX="27.0" layoutY="336.0" onKeyPressed="#c1BoxKeyPressed" prefHeight="25.0" prefWidth="75.0" />
+      <Label layoutX="27.0" layoutY="361.0" prefHeight="34.0" prefWidth="191.0" text="Określa jak dużą wagę cząstka przywiązuje do swojej pozycji " wrapText="true" />
+      <Label layoutX="29.0" layoutY="413.0" text="Współczynnik społeczny" />
+      <TextField fx:id="c2Box" layoutX="27.0" layoutY="430.0" onKeyPressed="#c2BoxKeypressed" prefHeight="25.0" prefWidth="75.0" />
+      <Label layoutX="28.0" layoutY="455.0" prefHeight="52.0" prefWidth="167.0" text="Określa jak dużą wagę cząstka przywiązuje do najlepszej pozycji znalezionej przez stado" wrapText="true" />
+      <Label layoutX="27.0" layoutY="532.0" text="Ilość iteracji z tą samą wartością do stopu" />
+      <TextField fx:id="iterStopBox" layoutX="24.0" layoutY="549.0" onKeyPressed="#iterStopBoxKeyPressed" prefHeight="25.0" prefWidth="75.0" />
+      <Button fx:id="calcButton" layoutX="24.0" layoutY="602.0" mnemonicParsing="false" onAction="#calcButtonPressed" text="Licz" />
+      <Label fx:id="swarmSizeErrorLabel" layoutX="109.0" layoutY="171.0" prefHeight="17.0" prefWidth="135.0" text="Nieprawidłowa wartość" textFill="RED" />
+      <Label fx:id="inertiaErrorLabel" layoutX="109.0" layoutY="245.0" prefHeight="17.0" prefWidth="135.0" text="Nieprawidłowa wartość" textFill="RED" />
+      <Label fx:id="c1ErrorLabel" layoutX="114.0" layoutY="340.0" prefHeight="17.0" prefWidth="135.0" text="Nieprawidłowa wartość" textFill="RED" />
+      <Label fx:id="c2ErrorLabel" layoutX="162.0" layoutY="413.0" prefHeight="17.0" prefWidth="135.0" text="Nieprawidłowa wartość" textFill="RED" />
+      <Label fx:id="iterStopErrorLabel" layoutX="109.0" layoutY="553.0" prefHeight="17.0" prefWidth="135.0" text="Nieprawidłowa wartość" textFill="RED" />
+      <Label layoutX="24.0" layoutY="151.0" text="(Wciśnij Escape by anulować wpisanie wartości)" />
+   </children>
+</AnchorPane>

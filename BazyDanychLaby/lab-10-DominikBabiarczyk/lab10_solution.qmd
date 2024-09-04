@@ -1,0 +1,381 @@
+---
+title: "lab10_solution"
+format: html
+editor: visual
+---
+
+```{r}
+library(readxl)
+# Przykładowa ścieżka do pliku Excela
+sciezka_do_pliku <- "beauty.csv"
+
+# Zaimportuj dane z arkusza "Sheet1"
+data <- read.csv(sciezka_do_pliku)
+
+```
+
+```{r}
+
+
+data$class <- NA
+
+sameCalss <- data[,18:48];
+
+
+for (i in 1:nrow(data)){
+  col_index <- which(data[i,18:47] == 1)
+  
+  
+  if(length(col_index) == 1){
+    data$class[i] = col_index
+  }else if(length(col_index) > 1){
+    data$class[i] = "more 1"
+  }
+}
+
+data <- data[,-c(18:47)]
+
+```
+
+```{r}
+analyze_column <- function(data, column_name) {
+  # Sprawdzamy, czy kolumna istnieje w ramce danych
+  if (!column_name %in% colnames(data)) {
+    stop("Podana kolumna nie istnieje w ramce danych.")
+  }
+
+  # Wybieramy kolumnę
+  column <- data[[column_name]]
+
+  # Wartości minimalna i maksymalna
+  min_value <- min(column)
+  max_value <- max(column)
+
+  # Podstawowe statystyki
+  mean_value <- mean(column)
+  median_value <- median(column)
+  sd_value <- sd(column)
+
+  # Znajdowanie wartości odstających
+  outliers <- boxplot.stats(column)$out
+
+  # Rysowanie histogramu
+  histogram <-hist(column, main = paste("Histogram kolumny", column_name),
+       xlab = column_name, col = "skyblue", border = "black")
+
+  # Wyświetlanie informacji
+  print(paste("Wartość minimalna:", min_value))
+  print(paste("Wartość maksymalna:", max_value))
+  print(paste("Średnia:", mean_value))
+  print(paste("Mediana:", median_value))
+  print(paste("Odchylenie standardowe:", sd_value))
+  print(paste("Wartości odstające:", outliers))
+}
+```
+
+## tenured
+
+```{r}
+actual_value <- data[, c(1), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+
+```
+
+## profnumber
+
+Numer profesora
+
+```{r}
+actual_value <- data[, c(2), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##minority mniejszość
+
+```{r}
+actual_value <- data[, c(3), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##age Wiek profesora
+
+```{r}
+actual_value <- data[, c(4), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## beautyf2upper
+
+studentka drugiego roku studiów wyższych
+
+```{r}
+actual_value <- data[, c(5), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##beautyflowerdiv ocena 10 do 1, studentka niższego stopnia
+
+```{r}
+actual_value <- data[, c(6), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## beautyfupperdiv
+
+ocena od 1 do 10 studentka wyższego stopnia
+
+```{r}
+actual_value <- data[, c(7), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## beautym2upper
+
+ocena od 1 do 10 student 2 roku wyszego stopnia
+
+```{r}
+actual_value <- data[, c(8), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##beautymlowerdiv ocena od 1 do 10 student niższego stopnia
+
+```{r}
+actual_value <- data[, c(9), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## beautymupperdiv
+
+ocena od 1 do 10 student wyższego stopnia
+
+```{r}
+actual_value <- data[, c(10), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##btystdave Średnia z 6 ustandaryzowanych ocen
+
+```{r}
+actual_value <- data[, c(11), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## btystdf2u
+
+```{r}
+actual_value <- data[, c(12), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##btystdfl
+
+```{r}
+actual_value <- data[, c(13), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## btystdfu
+
+```{r}
+actual_value <- data[, c(14), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## btystdm2u
+
+```{r}
+actual_value <- data[, c(15), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## btystdml
+
+```{r}
+actual_value <- data[, c(16), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## btystdmu
+
+```{r}
+actual_value <- data[, c(17), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##courseevaluation śreadnia ocen z kursu
+
+```{r}
+actual_value <- data[, c(18), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##didevaluation numer osoby wypełniającej oceny
+
+```{r}
+actual_value <- data[, c(19), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## female
+
+female = 1
+
+```{r}
+actual_value <- data[, c(20), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## fromal
+
+na obrazie widnieje marynakra/bluzka
+
+```{r}
+actual_value <- data[, c(21), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##fulldept zdjęcia w internecie
+
+```{r}
+actual_value <- data[, c(22), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##lower niska kategoria kursu
+
+```{r}
+actual_value <- data[, c(23), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## multipleclass
+
+Równe 1, jeśli więcej niż jeden nauczyciel prowadzi sekcje kursu w próbie
+
+```{r}
+actual_value <- data[, c(24), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## nonenglish
+
+Profesor nie pochodzący z kraju anglojęzycznego
+
+```{r}
+
+actual_value <- data[, c(25), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##onecredit jeden kredyt na kurs
+
+```{r}
+
+actual_value <- data[, c(26), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## percentevaluating
+
+```{r}
+
+actual_value <- data[, c(27), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##profevaluation średnia ocena intruktora
+
+```{r}
+
+actual_value <- data[, c(28), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##students zapisy na zajęcia
+
+```{r}
+
+actual_value <- data[, c(29), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##tenuretrack ścieżka stałego zatrudnienia
+
+```{r}
+
+actual_value <- data[, c(30), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##blkandwhite
+
+```{r}
+
+actual_value <- data[, c(31), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##btystdvariance
+
+```{r}
+
+actual_value <- data[, c(32), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+## btystdavepos
+
+```{r}
+actual_value <- data[, c(33), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##btystdaveneg
+
+```{r}
+actual_value <- data[, c(34), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```
+
+##class Pierwszy z wielu indywidualnych kursów
+
+```{r}
+actual_value <- data[, c(35), drop = FALSE]
+# Wywołanie funkcji
+analyze_column(actual_value, colnames(actual_value))
+```

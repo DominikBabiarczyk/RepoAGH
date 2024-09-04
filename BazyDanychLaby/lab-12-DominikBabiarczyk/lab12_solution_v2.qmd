@@ -1,0 +1,403 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+## Zadanie 1
+
+```{r}
+library(tidyverse)
+install.packages("caTools")
+library(caTools)
+```
+
+```{r}
+Scores <- read.csv("SCORES.csv")
+plot <- ggplot(data = Scores, mapping = aes(x=Hours, y=Scores )) + geom_point()
+print(plot)
+```
+
+```{r}
+# Podział danych - 70% treningowych, 30% testowych
+split <- sample.split(Scores$Scores, SplitRatio = 0.7)
+
+# Zbiór treningowy
+dane_treningowe <- subset(Scores, split == TRUE)
+
+# Zbiór testowy
+dane_testowe <- subset(Scores, split == FALSE)
+```
+
+```{r}
+print("Wszystkie dane")
+lmScores <- lm(Scores~Hours, data = Scores) #Create the linear regression
+summary(lmScores) 
+plot <- ggplot(Scores, aes(x = Hours, y = Scores)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+print("Dane treningowe")
+lmTreningowe <- lm(Scores~Hours, data = dane_treningowe)
+summary(lmTreningowe)
+plot <- ggplot(data=dane_treningowe, mapping=aes(x=Hours, y = Scores)) + geom_point() + stat_smooth(method="lm")
+print(plot)
+```
+
+```{r}
+b <- coef(lmTreningowe)[1]
+a <- coef(lmTreningowe)[2]
+
+getScores <- function(height){
+  result <- a*height + b
+  return(result)
+}
+
+predScores <- sapply(dane_testowe$Hours, getScores)
+print(predScores)
+print(dane_testowe$Scores)
+```
+
+```{r}
+dataFrameTest <- data.frame(hour = dane_testowe$Hours, calculatedScores = predScores, Scores = dane_testowe$Scores)
+plot <- ggplot(data = dataFrameTest, mapping = aes(x=hour, y=Scores)) + geom_point() + stat_smooth(method="lm")
+print(plot)
+```
+
+```{r}
+
+# Funkcja do obliczania MAE
+mae <- function(y_true, y_pred) {
+  return(mean(abs(y_true - y_pred)))
+}
+
+# Funkcja do obliczania MSE
+mse <- function(y_true, y_pred) {
+  return(mean((y_true - y_pred)^2))
+}
+
+# Funkcja do obliczania RMSE
+rmse <- function(y_true, y_pred) {
+  return(sqrt(mean((y_true - y_pred)^2)))
+}
+
+# Przypisanie kolumn do zmiennych
+y_true <- dataFrameTest$calculatedScores
+y_pred <- dataFrameTest$Scores
+
+# Obliczenia metryk
+mae_result <- mae(y_true, y_pred)
+mse_result <- mse(y_true, y_pred)
+rmse_result <- rmse(y_true, y_pred)
+
+# Wydrukowanie wyników
+cat("Mean Absolute Error (MAE):", mae_result, "\n")
+cat("Mean Squared Error (MSE):", mse_result, "\n")
+cat("Root Mean Squared Error (RMSE):", rmse_result, "\n")
+
+```
+
+```{r}
+SBP <- read.csv("SBP.csv")
+plot <- ggplot(data = SBP, mapping = aes(x=Age, y=SBP )) + geom_point()
+print(plot)
+
+# Podział danych - 70% treningowych, 30% testowych
+split <- sample.split(SBP$SBP, SplitRatio = 0.7)
+
+# Zbiór treningowy
+dane_treningowe <- subset(SBP, split == TRUE)
+
+# Zbiór testowy
+dane_testowe <- subset(SBP, split == FALSE)
+
+print("Wszystkie dane")
+lmSBP <- lm(SBP~Age, data = SBP) #Create the linear regression
+summary(lmSBP) 
+plot <- ggplot(SBP, aes(x = Age, y = SBP)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+print("Dane treningowe")
+lmTreningowe <- lm(SBP~Age, data = dane_treningowe)
+summary(lmTreningowe)
+plot <- ggplot(data=dane_treningowe, mapping=aes(x=Age, y = SBP)) + geom_point() + stat_smooth(method="lm")
+print(plot)
+
+b <- coef(lmTreningowe)[1]
+a <- coef(lmTreningowe)[2]
+
+getSBP <- function(height){
+  result <- a*height + b
+  return(result)
+}
+
+predSBP <- sapply(dane_testowe$Age, getSBP)
+print(predSBP)
+print(dane_testowe$SBP)
+
+dataFrameTest <- data.frame(hour = dane_testowe$Age, calculatedSBP = predSBP, SBP = dane_testowe$SBP)
+plot <- ggplot(data = dataFrameTest, mapping = aes(x=hour, y=SBP)) + geom_point() + stat_smooth(method="lm")
+print(plot)
+
+mae <- function(y_true, y_pred) {
+  return(mean(abs(y_true - y_pred)))
+}
+
+# Funkcja do obliczania MSE
+mse <- function(y_true, y_pred) {
+  return(mean((y_true - y_pred)^2))
+}
+
+# Funkcja do obliczania RMSE
+rmse <- function(y_true, y_pred) {
+  return(sqrt(mean((y_true - y_pred)^2)))
+}
+
+# Przypisanie kolumn do zmiennych
+y_true <- dataFrameTest$calculatedSBP
+y_pred <- dataFrameTest$SBP
+
+# Obliczenia metryk
+mae_result <- mae(y_true, y_pred)
+mse_result <- mse(y_true, y_pred)
+rmse_result <- rmse(y_true, y_pred)
+
+# Wydrukowanie wyników
+cat("Mean Absolute Error (MAE):", mae_result, "\n")
+cat("Mean Squared Error (MSE):", mse_result, "\n")
+cat("Root Mean Squared Error (RMSE):", rmse_result, "\n")
+```
+
+```{r}
+
+```
+
+Wyniki są zadowalające
+
+## Zadanie 2
+
+print(plot)
+
+plot \<- ggplot(data = petrol, mapping = aes(x=Procent_ludnosci_z_prawem_jazdy, y=,Zuzycie_paliwa )) + geom_point()
+
+print(plot)
+
+```{r}
+petrol <- read.csv("PETROL.csv")
+
+plot <- ggplot(data = petrol, mapping = aes(x=Procent_ludnosci_z_prawem_jazdy, y=Zuzycie_paliwa )) + geom_point()
+print(plot)
+plot <- ggplot(data = petrol, mapping = aes(x=Utwardzone_autostrady, y=Zuzycie_paliwa )) + geom_point()
+print(plot)
+plot <- ggplot(data = petrol, mapping = aes(x=Sredni_przychod, y=Zuzycie_paliwa )) + geom_point()
+print(plot)
+plot <- ggplot(data = petrol, mapping = aes(x=Podatek_paliwowy, y=Zuzycie_paliwa )) + geom_point()
+
+
+# Podział danych - 70% treningowych, 30% testowych
+split <- sample.split(petrol$Zuzycie_paliwa, SplitRatio = 0.7)
+
+# Zbiór treningowy
+dane_treningowe <- subset(petrol, split == TRUE)
+
+# Zbiór testowy
+dane_testowe <- subset(petrol, split == FALSE)
+
+print("Wszystkie dane")
+lmSBP <- lm(Zuzycie_paliwa~Procent_ludnosci_z_prawem_jazdy + Procent_ludnosci_z_prawem_jazdy + Utwardzone_autostrady + Sredni_przychod + Podatek_paliwowy, data = petrol) #Create the linear regression
+summary(lmSBP) 
+
+plot <- ggplot(petrol, aes(x = Procent_ludnosci_z_prawem_jazdy, y = ,Zuzycie_paliwa)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+plot <- ggplot(petrol, aes(x = Utwardzone_autostrady, y = ,Zuzycie_paliwa)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+plot <- ggplot(petrol, aes(x = Sredni_przychod, y = ,Zuzycie_paliwa)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+plot <- ggplot(petrol, aes(x = Podatek_paliwowy, y = ,Zuzycie_paliwa)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+
+print("Dane treningowe")
+lmTreningowe <- lm(Zuzycie_paliwa~Procent_ludnosci_z_prawem_jazdy, data = dane_treningowe)
+summary(lmTreningowe)
+plot <- ggplot(data=dane_treningowe, mapping=aes(x=Procent_ludnosci_z_prawem_jazdy, y = ,Zuzycie_paliwa)) + geom_point() + stat_smooth(method="lm")
+print(plot)
+
+b <- coef(lmTreningowe)[1]
+a <- coef(lmTreningowe)[2]
+
+getSBP <- function(height){
+  result <- a*height + b
+  return(result)
+}
+
+predSBP <- sapply(dane_testowe$Procent_ludnosci_z_prawem_jazdy, getSBP)
+print(predSBP)
+print(dane_testowe$SBP)
+
+dataFrameTest <- data.frame(hour = dane_testowe$Procent_ludnosci_z_prawem_jazdy, calculatedSBP = predSBP, SBP = dane_testowe$Zuzycie_paliwa)
+plot <- ggplot(data = dataFrameTest, mapping = aes(x=hour, y=SBP)) + geom_point() + stat_smooth(method="lm")
+print(plot)
+
+mae <- function(y_true, y_pred) {
+  return(mean(abs(y_true - y_pred)))
+}
+
+# Funkcja do obliczania MSE
+mse <- function(y_true, y_pred) {
+  return(mean((y_true - y_pred)^2))
+}
+
+# Funkcja do obliczania RMSE
+rmse <- function(y_true, y_pred) {
+  return(sqrt(mean((y_true - y_pred)^2)))
+}
+
+# Przypisanie kolumn do zmiennych
+y_true <- dataFrameTest$calculatedSBP
+y_pred <- dataFrameTest$SBP
+
+# Obliczenia metryk
+mae_result <- mae(y_true, y_pred)
+mse_result <- mse(y_true, y_pred)
+rmse_result <- rmse(y_true, y_pred)
+
+# Wydrukowanie wyników
+cat("Mean Absolute Error (MAE):", mae_result, "\n")
+cat("Mean Squared Error (MSE):", mse_result, "\n")
+cat("Root Mean Squared Error (RMSE):", rmse_result, "\n")
+```
+
+```{r}
+lmSBP <- lm(Zuzycie_paliwa~Procent_ludnosci_z_prawem_jazdy, data = petrol) #Create the linear regression
+summary(lmSBP) 
+plot <- ggplot(petrol, aes(x = Procent_ludnosci_z_prawem_jazdy, y = ,Zuzycie_paliwa)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+
+lmSBP <- lm(Zuzycie_paliwa~Utwardzone_autostrady, data = petrol) #Create the linear regression
+summary(lmSBP) 
+plot <- ggplot(petrol, aes(x = Utwardzone_autostrady, y = ,Zuzycie_paliwa)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+lmSBP <- lm(Zuzycie_paliwa~Sredni_przychod, data = petrol) #Create the linear regression
+summary(lmSBP)
+plot <- ggplot(petrol, aes(x = Sredni_przychod, y = ,Zuzycie_paliwa)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+
+lmSBP <- lm(Zuzycie_paliwa~Podatek_paliwowy, data = petrol) #Create the linear regression
+summary(lmSBP) 
+plot <- ggplot(petrol, aes(x = Podatek_paliwowy, y = ,Zuzycie_paliwa)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+print(plot)
+```
+
+Duży na zużycie paliwa ma podatek paliwowy im większy podatek tym mniej ludzi decyduje się na jazdę. Wraz ze wzrostem przychodu maleje zużycie paliwa natomiast utwardzenie autostrady nie ma znaczenia. Największy udział przy zurzyciu paliwa ma procent osób z prawem jazdy.
+
+## Zadanie 3
+
+```{r}
+heart <- read.csv("HEART.csv")
+heartCorrect <- subset(heart, select = -c(slope, ca, thal))
+heartCorrect <- heartCorrect[apply(heartCorrect, 1, function(row) !any(row == "?")), ]
+
+heartCorrect$cp <- as.factor(heartCorrect$cp)
+heartCorrect$restecg <- as.factor(heartCorrect$restecg)
+
+encoded_cp <- as.data.frame(model.matrix(~cp - 1, data = heartCorrect))
+encoded_restecg <- as.data.frame(model.matrix(~restecg -1 , data = heartCorrect))
+
+# Wydrukowanie zakodowanego DataFrame
+print(encoded_heart)
+print(encoded_restecg)
+
+heartCorrect$cp1 <- encoded_cp$cp1
+heartCorrect$cp2 <- encoded_cp$cp2
+heartCorrect$cp3 <- encoded_cp$cp3
+heartCorrect$cp4 <- encoded_cp$cp4
+
+heartCorrect <- subset(heartCorrect, select = -cp)
+
+heartCorrect <- merge(heartCorrect, encoded_restecg)
+
+heartCorrect <- subset(heartCorrect, select = -restecg)
+
+```
+
+```{r}
+# Przykładowe dane
+df <- data.frame(
+  Kolor = c("czerwony", "zielony", "niebieski", "czerwony", "zielony")
+)
+
+# Zakodowanie wartości dummy
+encoded_df <- as.data.frame(model.matrix(~Kolor - 1, data = df))
+
+# Wydrukowanie zakodowanego DataFrame
+print(encoded_df)
+
+
+```
+
+```{r}
+df <- data.frame(
+  Kolor = c(1, 2, 3, 1, 2)
+)
+
+# Konwersja na faktor
+df$Kolor <- as.factor(df$Kolor)
+
+# Zakodowanie wartości dummy
+encoded_df <- as.data.frame(model.matrix(~Kolor - 1, data = df))
+
+# Wydrukowanie zakodowanego DataFrame
+print(encoded_df)
+```
+
+```{r}
+bank_df <- read_csv2("bank-full.csv")
+```
+
+```{r}
+set.seed(421)
+split <- initial_split(heartCorrect, prop = 0.8, strata = num)
+train <- split %>% 
+         training()
+test <- split %>% 
+        testing()
+
+train <- train %>% mutate_all(as.factor) 
+
+model <- logistic_reg(mixture = double(1), penalty = double(1)) %>%
+  set_engine("glmnet") %>%
+  set_mode("classification") %>%
+  fit(num ~ ., data = train)
+
+# Model summary
+tidy(model)
+```
+
+```{r}
+
+```

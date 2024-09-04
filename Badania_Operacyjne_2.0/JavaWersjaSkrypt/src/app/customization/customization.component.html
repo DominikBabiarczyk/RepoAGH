@@ -1,0 +1,235 @@
+<div class="container">
+
+    <form [formGroup]="customizationForm" (ngSubmit)="onSubmit()">
+    <div class="formContainer">
+        <div class="firstColumn">
+
+            <div class="algorithmProperites" formGroupName="algorithmProperites">
+                <div class="firstColumnInputContainer">
+                    <div class="inputDiv">
+                        <label>Swarm Size</label>
+                        <input 
+                        type="text" 
+                        class="form-control"
+                        id="swarmSize"
+                        formControlName="swarmSize">
+                    </div>
+                    <div class="inputDiv">
+                        <label>Inertia</label>
+                        <input 
+                        type="text" 
+                        class="form-control"
+                        id="inertia"
+                        formControlName="inertia">
+                    </div>
+                </div>
+
+                <div class="firstColumnInputContainer">
+                    <div class="inputDiv">
+                        <label>C1</label>
+                        <input 
+                        type="text" 
+                        class="form-control"
+                        id="c1"
+                        formControlName="c1">
+                    </div>
+                    <div class="inputDiv">
+                        <label>C2</label>
+                        <input 
+                        type="text" 
+                        class="form-control"
+                        id="c2"
+                        formControlName="c2">
+                    </div>
+                </div>
+
+                <div class="firstColumnInputContainer">
+                    <div class="inputDiv">
+                        <label>IterStop</label>
+                        <input 
+                        type="text"
+                        class="form-control"
+                        id="IterStop"
+                        formControlName="c2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="factoryProperties" formGroupName="factoryProperties">
+                <div class="firstColumnInputContainer">
+                    <div class="inputDiv">
+                        <label>Donate Value</label>
+                        <input 
+                        type="text" 
+                        class="form-control"
+                        id="donateValue"
+                        formControlName="donateValue">
+                    </div>
+                    
+                    <div class="inputDiv">
+                        <label>Cum Penalty Value</label>
+                        <input 
+                        type="text" 
+                        class="form-control"
+                        id="cumPenaltyValue"
+                        formControlName="cumPenaltyValue">
+                    </div>
+                </div>
+            </div>
+
+            <div class="buttonDiv">
+                <button type="submit" class="btn btn-primary">
+                    Calculate
+                </button>
+            </div>
+
+        </div>
+
+        <div class="secondColumn">
+            <div class="twoTable" formGroupName="factoryProperties">
+                <div class="inputTable" formArrayName="productionTable">
+                    <h4>Koszt Produkcji</h4>
+                    <table class="table table1">
+                        <thead>
+                            <tr>
+                                <th>Liczba</th>
+                                <th>Koszt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                            *ngFor="let production of getProductionCost(); let i = index"
+                            >
+                                <td>{{products[i]}}</td>
+                                <td><input type="text" class="form-control" [formControlName]="i"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="inputTable" formArrayName="warehouseTable">
+                    <h4>Koszt Magazynowania</h4>
+                    <table class="table table1">
+                        <thead>
+                            <tr>
+                                <th>Liczba</th>
+                                <th>Koszt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                            *ngFor="let production of getWarehouseCost(); let i = index"
+                            >
+                                <td>{{products[i]}}</td>
+                                <td><input type="text" class="form-control" [formControlName]="i"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="inputTable" formArrayName="penaltyTable">
+                    <h4>Kara za brak produktów</h4>
+                    <table class="table table1">
+                        <thead>
+                            <tr>
+                                <th>Liczba</th>
+                                <th>Koszt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                            *ngFor="let production of getPenaltyTable(); let i = index"
+                            >
+                                <td>{{i + 1}}</td>
+                                <td><input type="text" class="form-control" [formControlName]="i"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="inputTable" formArrayName="scheduledProduction">
+                    <h4>Harmonogram</h4>
+                    <table class="table table1">
+                        <thead>
+                            <tr>
+                                <th>Liczba</th>
+                                <th>Koszt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                            *ngFor="let production of getScheduledProduction(); let i = index"
+                            >
+                                <td>{{i + 1}}</td>
+                                <td><input type="text" class="form-control" [formControlName]="i"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+
+    <div class="resultPage">
+        <div class="firstColumn">
+            <div class="costDisplay">
+                <h4>Koszt:</h4>
+                <h4>Duży</h4>
+            </div>
+            <div>
+                Produkcja:
+                <div class="resultTable">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Dzień</th>
+                                <td
+                                *ngFor="let i of numbers"
+                                >{{i}}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Ilość</th>
+                                <td
+                                *ngFor="let i of numbers"
+                                >{{100 * i}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                Magazyn:
+                <div class="resultTable">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Dzień</th>
+                                <td
+                                *ngFor="let i of numbers"
+                                >{{i}}</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Ilość</th>
+                                <td
+                                *ngFor="let i of numbers"
+                                >{{100 * i}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="secondColumn">
+            <div id="plot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+</div>
+  

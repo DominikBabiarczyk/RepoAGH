@@ -1,0 +1,199 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+```{r}
+# Załaduj niezbędne biblioteki
+library(tidyr)
+
+# Utwórz przykładowe dane
+set.seed(1717) # zamiast ... wpisz sumaryczną liczbę liter z twojego imienia i nazwiska pomnżone przez 101
+produkty <- c("Produkt_A", "Produkt_B", "Produkt_C")
+kwartały <- c("Q1", "Q2", "Q3", "Q4")
+
+sales_data <- data.frame(
+  Produkt = rep(produkty, each = length(kwartały)),
+  Q1 = sample(100:500, 12),
+  Q2 = sample(100:500, 12),
+  Q3 = sample(100:500, 12),
+  Q4 = sample(100:500, 12)
+)
+```
+
+```{r}
+set.seed(1717) # zamiast ... wpisz sumaryczną liczbę liter z twojego imienia i nazwiska pomnżone przez 101
+produkty <- c("Produkt_A", "Produkt_B", "Produkt_C")
+sklepy <- c("Sklep_X", "Sklep_Y", "Sklep_Z")
+miesiace <- c("Styczeń", "Luty", "Marzec")
+
+sales_data_advanced <- data.frame(
+  Produkt = rep(produkty, each = length(sklepy) * length(miesiace)),
+  Sklep = rep(sklepy, times = length(produkty) * length(miesiace)),
+  Miesiac = rep(miesiace, each = length(produkty) * length(sklepy)),
+  Sprzedaz = sample(100:500, 27),
+  Koszty = sample(30:200, 27),
+  Zysk = NA
+)
+sales_data_advanced$Zysk <- sales_data_advanced$Sprzedaz - sales_data_advanced$Koszty
+```
+
+Zawiera on informacje o kwartalnych sprzedażach różnych produktów w formie szerokiej.
+
+1.  Użyj funkcji `pivot_longer()` do przekształcenia zbioru danych `sales_data` z formatu szerokiego na format długi. Wynikowy zbiór danych powinien mieć kolumny: `Produkt`, `Kwartał`, i `Sprzedaż`.
+
+```{r}
+
+sales_data_long1 <- sales_data |> pivot_longer(cols = c(Q1, Q2, Q3, Q4), names_to = 'kwartal', values_to = 'wartosc')
+```
+
+1.  Stwórz tabelę podsumowującą, która pokaże całkowitą sprzedaż dla każdego produktu we wszystkich kwartałach. Możesz użyć funkcji `group_by()` i `summarize()` z pakietu `dplyr`.
+
+```{r}
+library(dplyr)
+group_sales_data <- sales_data |> group_by(Produkt)
+sumarizeSales <- group_sales_data |> mutate(suma = Q1+Q2+Q3+Q4, srednia_dla_produktu = mean(c(Q1,Q2,Q3,Q4)))
+```
+
+1.  Teraz użyj funkcji `pivot_wider()` do przywrócenia danych w formacie szerokim.
+
+```{r}
+salesDataWider <- sales_data_long1 |> pivot_wider(names_from = c(kwartal), values_from = wartosc)
+```
+
+1.  **Filtrowanie danych:** Wybierz tylko te rekordy, gdzie zysk jest dodatni.
+
+```{r}
+positiveProfit <- sales_data_advanced |> filter(Zysk>0)
+print(positiveProfit)
+```
+
+1.  **Sortowanie danych:** Posortuj dane według malejącego zysku, a następnie według nazw produktów rosnąco.
+
+```{r}
+SortedProfitName1 <- sales_data_advanced[order(desc(sales_data_advanced$Zysk), sales_data_advanced$Produkt),]
+print(SortedProfitName1)
+```
+
+1.  **Tworzenie nowych kolumn:** Dodaj kolumnę `Marza_Procentowa`, która będzie zawierała procentową marżę zysku dla każdego rekordu.
+
+```{r}
+additionalColumn <- sales_data_advanced |> mutate(Marza_Procentowa = (Zysk * 100)/Sprzedaz)
+print(additionalColumn)
+```
+
+1.  **Agregacja danych:** Stwórz tabelę, która pokaże średnią sprzedaż, koszty i zysk dla każdego sklepu.
+
+```{r}
+groupedShops <- sales_data_advanced |> group_by(Sklep)
+
+sumSalesCostProfit <- groupedShops |> summarize(srednia_Sprzedazy = mean(Sprzedaz), srednia_Kosztow = mean(Koszty), srednia_Zyskow = mean(Zysk))
+print(sumSalesCostProfit)
+```
+
+1.  **Pivotowanie danych:** Przekształć dane w taki sposób, aby w jednym wierszu były informacje o sprzedaży, kosztach i zysku dla danego produktu w danym sklepie w danym miesiącu.
+
+```{r}
+groupedShops <- sales_data_advanced |> group_by(Produkt, Sklep, Miesiac)
+
+SalesCostProfitForProduct <- groupedShops |> summarize(suma_Sprzedazy = sum(Sprzedaz), suma_Kosztow = sum(Koszty), suma_Zyskow = sum(Zysk))
+print(SalesCostProfitForProduct)
+
+groupedSalesCostProfitForProduct <- SalesCostProfitForProduct |> group_by(Produkt, Sklep, Miesiac)
+
+pivotData <- groupedSalesCostProfitForProduct |> pivot_longer(cols = c(Produkt, Sklep, Miesiac), names_to = 'PSM', values_to = 'wartosc')
+print(pivotData)
+```
+
+1.  **Dodatkowe przekształcenie danych:** Dodaj nową kolumnę `Koszty_na_Sprzedaz` reprezentującą procentowy udział kosztów w sprzedaży.
+
+```{r}
+dataWithCostInSales <- sales_data_advanced |> mutate(Koszty_na_Sprzedaz = (Koszty*100)/Sprzedaz)
+print(dataWithCostInSales)
+```
+
+1.  **Powrót do szerokiego formatu:** Przekształć dane tak, aby wrócić do pierwotnego formatu, gdzie każdy wiersz reprezentuje produkt w danym sklepie w danym miesiącu.
+
+```{r}
+returningToWiderFormat <- pivotData |> pivot_wider(names_from = c(PSM), values_from = wartosc)
+print(returningToWiderFormat)
+```
+
+1.  **Zaawansowane wybieranie danych:** Wybierz rekordy z największymi kosztami na sprzedaż dla każdego produktu.
+
+```{r}
+result <- dataWithCostInSales |> group_by(Produkt) |> slice_max(order_by = Koszty_na_Sprzedaz)
+print(result)
+```
+
+1.  Określ, który przewoźnik ma największe opóźnienia przylotu? Przeanalizuj czy opóźnienia mają związek tylko z przewoźnikiem czy też również z lotniskiem docelowym.
+
+```{r}
+library(nycflights13)
+flights <- nycflights13::flights
+theMostDelayedForCarrier <- flights |> group_by(carrier) |> slice_max(arr_delay, n=1) |> select(carrier, arr_delay, dest)
+print(theMostDelayedForCarrier)
+theMostDelayedForAirport <- flights |> group_by(dest) |> slice_max(arr_delay, n=1) |> select(carrier, arr_delay, dest)
+print(theMostDelayedForAirport) 
+```
+
+1.  Znajdź loty, które są najbardziej opóźnione przy odlocie z każdego lotniska.
+
+```{r}
+theMostDelayedDeparture <- flights |> group_by(origin) |> slice_max(dep_delay)
+print(theMostDelayedDeparture)
+```
+
+1.  Wczytaj zbiór danych za pomocą funkcji `read_csv()`
+
+```{r}
+songs <- read.csv("billboard.csv")
+
+```
+
+1.  Sporządź tabelę zawierającą wszystkie piosenki, które **spadły** z listy we wrześniu 2000. (Wskazówka: poszukaj w Google jak dodawać określony czas do daty w R. Jeżeli piszesz własną funkcję do użīcia w `mutate()` pamiętaj o wektoryzacji)
+
+```{r}
+week <- songs[, 8:ncol(songs)]
+find_first_null_column_in_row <- function(row) {
+  column_with_null <- which(is.na(row))
+  return(column_with_null[1]-7)
+}
+conditionFunction <- function(row){
+  #weeks <- row[, 8:ncol(row)]
+  first_null_column_in_row <- find_first_null_column_in_row(row)
+  if(is.na(first_null_column_in_row)){
+    return(FALSE)
+  }
+  droppedWeek <- first_null_column_in_row
+  releaseDate <- row[6]
+  droppedDate <- as.Date(releaseDate) + 7*droppedWeek
+  startDate <- as.Date("2000-09-01")
+  EndDate <- as.Date("2000-09-30")
+  if(droppedDate>=startDate && droppedDate<=EndDate){
+    return(TRUE)  
+  }else{
+    return(FALSE)
+  }
+}
+
+selected_rows <- songs %>% filter(apply(., 1, conditionFunction))
+print(selected_rows)
+```
+
+1.  Określ, która z piosenek danego gatunku była na liście najdłużej.
+
+```{r}
+find_first_null_column_in_row1 <- function(row) {
+  column_with_null <- which(is.na(row))
+  if(is.na(column_with_null)){
+    return(ncol(row)-7)
+  }
+  return(column_with_null[1]-7)
+}
+songsWithTimeInList <- songs %>% mutate( timeInList = apply(songs, 1, find_first_null_column_in_row))
+print(songsWithTimeInList)
+groupedSongs <- songsWithTimeInList |> group_by(genre) |> slice_max(timeInList) 
+print(groupedSongs)
+```

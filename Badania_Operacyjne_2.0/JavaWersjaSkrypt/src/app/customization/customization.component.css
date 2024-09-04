@@ -1,0 +1,76 @@
+.formContainer {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.firstColumnInputContainer {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.algorithmProperites {
+    background-color: lightgreen;
+}
+
+.firstColumn {
+    /* flex: 1; */
+    background-color: aqua;
+}
+
+.inputDiv {
+    padding: 10px;
+}
+
+.secondColumn {
+    flex: 1;
+    background-color: red;
+}
+
+.twoTable {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+label {
+    display: block;
+}
+
+.table1 {
+    padding: 10px;
+}
+
+.inputTable {
+    padding-left: 10px;
+    padding-right: 10px;
+    flex: 1;
+}
+
+td, th {
+    /* padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+    font-size: 13px; */
+}
+
+div, input {
+    font-size: 13px;
+}
+
+.buttonDiv {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+input[type="text"] {
+    width: 100px;
+}
+
+.resultPage {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}

@@ -1,0 +1,1 @@
+-IC:/repozytoriumGIT/include -IC:/repozytoriumGIT/googletest-master/googlemock/include -IC:/repozytoriumGIT/googletest-master/googlemock -isystem C:/repozytoriumGIT/googletest-master/googletest/include -isystem C:/repozytoriumGIT/googletest-master/googletest

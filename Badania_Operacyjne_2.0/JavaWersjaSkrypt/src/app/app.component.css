@@ -1,0 +1,9 @@
+/* .container {
+    
+} */
+
+.application {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}

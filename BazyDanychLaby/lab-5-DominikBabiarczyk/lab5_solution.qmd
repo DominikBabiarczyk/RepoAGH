@@ -1,0 +1,102 @@
+---
+title: "lab5_soturion"
+format: html
+editor: visual
+---
+
+```{print}
+```
+
+```{r}
+tablica_character <- character(5)
+tablica_character[1] <- "BeD"
+tablica_character[2] <- "BLOOD"
+tablica_character[3] <- "SonS"
+tablica_character[4] <- "son"
+tablica_character[5] <- "cry"
+t <- film_title_case_insensitive(tablica_character)
+print(t)
+
+```
+
+1.  Znajdź wszystkie nazwy krajów rozpoczynających się na P.
+
+```{r}
+  queryIncomplete <- "
+  select country.country from country 
+  where country.country LIKE 'P%'";
+  
+  starP <- dbGetQuery(con, queryIncomplete);
+  print(starP)
+  
+  for(i in seq_along(words)) {
+    if(i != 1) {
+      queryIncomplete <- paste(queryIncomplete, "|", sep="", end="");
+    }
+    queryIncomplete <- paste(queryIncomplete, "\\m", sep="", end="");
+    queryIncomplete <- paste(queryIncomplete, words[i], sep="", end="");
+    queryIncomplete <- paste(queryIncomplete, "\\M", sep="", end="");
+  }
+  queryCompleted <- paste(queryIncomplete, "' order by title;", sep="", end="")
+```
+
+1.  Znajdź wszystkie nazwy krajów rozpoczynających się P i kończących na s.
+
+```{r}
+query <- "
+SELECT country.country FROM country 
+WHERE country.country LIKE 'P%s'"
+startPEnds <- dbGetQuery(con, query)
+print(startPEnds)
+```
+
+1.  Znajdź wszystkie tytuły filmów, w których znajdują się cyfry.
+
+```{r}
+query <- "
+SELECT film.title FROM film 
+WHERE film.title ~ '[0-9]'"
+startPEnds <- dbGetQuery(con, query)
+print(startPEnds)
+```
+
+1.  Znajdź wszystkich pracowników z podwójnym imieniem lub nazwiskiem.
+
+```{r}
+query <- "
+SELECT first_name, last_name FROM staff  
+WHERE staff.first_name LIKE '% %' OR staff.last_name LIKE '% %'"
+staff <- dbGetQuery(con, query)
+print(staff)
+
+```
+
+1.  Znajdź wszystkie nazwiska aktorów rozpoczynających się od P lub C i mających 5 znaków
+
+```{r}
+query <- "
+SELECT last_name FROM actor
+WHERE last_name ~* '^[CP].{4}$'"
+last_name <- dbGetQuery(con, query)
+print(last_name)
+```
+
+1.  Znajdź wszystkie tytuły filmów, w których występują słowa Trip lub Alone.
+
+```{r}
+query <- "
+SELECT title FROM film
+WHERE title ~* 'Trip|Alone'"
+title <- dbGetQuery(con, query)
+print(title)
+```
+
+```{r}
+query <- "select first_name from actor where first_name ~ '^Al[a:z,1:9]*'"
+name <- dbGetQuery(con, query)
+print(name)
+
+query <- "select first_name from actor where first_name ~* '^al[a:z,1:9]*'"
+name <- dbGetQuery(con, query)
+print(name)
+```

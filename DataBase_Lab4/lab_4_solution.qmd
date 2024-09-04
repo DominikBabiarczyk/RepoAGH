@@ -1,0 +1,247 @@
+---
+title: "zadania"
+format: html
+editor: visual
+---
+
+1.  Znajdź listę wszystkich filmów o tej samej długości.
+
+    ```{r}
+
+    dsn_database = "wbauer_adb_2023"   # Specify the name of  Database
+    dsn_hostname = "pgsql-196447.vipserv.org"  # Specify host name 
+    dsn_port = "5432"                # Specify your port number. 
+    dsn_uid = "wbauer_adb"         # Specify your username. 
+    dsn_pwd = "adb2020"        # Specify your password.
+
+    library(DBI)
+    library(RPostgres)
+    library(testthat)
+    library(stringr)
+
+    con <- dbConnect(Postgres(), dbname = dsn_database, host=dsn_hostname, port=dsn_port, user=dsn_uid, password=dsn_pwd) 
+
+    min_length = 0
+    max_length = 400
+
+      number_film_by_length <- dbGetQuery(con, glue::glue("
+      SELECT 
+      DISTINCT film.length,
+      film.title
+      
+      FROM film 
+
+      WHERE film.length >= {min_length} AND film.length <= {max_length}
+      ORDER BY film.length"))
+    print(number_film_by_length)
+    ```
+
+2.  Znajdź wszystkich klientów mieszkających w tym samym mieście.
+
+    ```{r}
+    client_from_city("London")
+    ```
+
+3.  Oblicz średni koszt wypożyczenia wszystkich filmów
+
+```{r}
+  query <- 
+  "SELECT AVG(payment.amount) FROM payment
+  
+  JOIN rental ON payment.rental_id = rental.rental_id
+  JOIN inventory ON rental.inventory_id = inventory.inventory_id
+  JOIN film ON inventory.film_id = film.film_id"
+  result <- dbGetQuery(con, query)
+  print(result)
+```
+
+Oblicz i wyświetl liczbę filmów we wszystkich kategoriach.
+
+```{r}
+library(dplyr)
+categories <- dbGetQuery(con, "SELECT DISTINCT name FROM category")
+for (i in 1:nrow(categories)){
+  print(number_films_in_category(i))
+}
+
+```
+
+Wyświetl liczbę wszystkich klientów pogrupowanych według kraju.
+
+```{r}
+client_from_country<- function(country){
+  if (!is.character(country) || is.null(country)){
+    return(NULL)
+  }
+  query <- 
+    "  SELECT 
+  country.country,
+  customer.first_name,
+  customer.last_name
+  
+  FROM country
+  
+  JOIN city ON city.country_id = country.country_id
+  JOIN address ON address.city_id = city.city_id
+  JOIN customer ON customer.address_id = address.address_id
+  WHERE "
+  
+  query <- str_replace(query, "CITY", city)
+
+  clientFromCity <- dbGetQuery(con, query)
+  
+  colnames(clientFromCity) <- c('city', 'first_name', 'last_name')
+  return(clientFromCity)
+}
+  query <- 
+    "  SELECT 
+  country.country,
+  customer.first_name,
+  customer.last_name
+  
+  FROM country
+  
+  JOIN city ON city.country_id = country.country_id
+  JOIN address ON address.city_id = city.city_id
+  JOIN customer ON customer.address_id = address.address_id
+   
+  ORDER BY country.country"
+
+  clientFromCity <- dbGetQuery(con, query)
+  print(clientFromCity)
+  print(nrow(clientFromCity))
+  
+```
+
+Wyświetl informacje o sklepie, który ma więcej niż 100 klientów i mniej niż 300 klientów.
+
+```{r}
+shops_by_min_and_max_client <- function(min_client, max_client, store){
+  shops <- dbGetQuery(con, glue::glue( "
+  SELECT 
+  COUNT(customer)
+  FROM customer
+  
+  JOIN store ON store.store_id = customer.store_id
+  
+  WHERE customer.store_id = {store}"))
+
+  return(shops)
+}
+
+query <- "SELECT store_id, manager_staff_id, address_id, last_update
+FROM store
+WHERE store_id IN (
+    SELECT store_id
+    FROM customer
+    GROUP BY store_id
+    HAVING COUNT(*) > 100 AND COUNT(*) < 300
+);"
+
+result <- dbGetQuery(con, query)
+print(result)
+```
+
+Wybierz wszystkich klientów, którzy oglądali filmy ponad 200 godzin.
+
+```{r}
+query <- "SELECT customer_id FROM customer
+WHERE customer_id IN (
+  SELECT customer.customer_id FROM customer
+  
+  JOIN rental ON rental.customer_id = customer.customer_id
+  JOIN inventory ON inventory.inventory_id = rental.inventory_id
+  JOIN film ON film.film_id = inventory.film_id
+  
+  GROUP BY customer.customer_id
+  HAVING SUM(film.length) > 200);"
+result <- dbGetQuery(con, query)
+print(result)
+
+query2 <- "SELECT customer.customer_id, SUM(film.length) AS total_length
+FROM customer
+JOIN rental ON rental.customer_id = customer.customer_id
+JOIN inventory ON inventory.inventory_id = rental.inventory_id
+JOIN film ON film.film_id = inventory.film_id
+GROUP BY customer.customer_id"
+lengthFilmForCustomer <- dbGetQuery(con, query2)
+print(lengthFilmForCustomer)
+```
+
+Oblicz średnią wartość wypożyczenia filmu.
+
+```{r}
+query <- "
+  SELECT
+  film.film_id,
+  AVG(payment.amount)
+  
+  FROM payment
+  JOIN rental ON payment.rental_id = rental.rental_id
+  JOIN inventory ON rental.inventory_id = inventory.inventory_id
+  JOIN film ON inventory.film_id = film.film_id
+  
+  GROUP BY film.film_id
+  ORDER BY film.film_id ASC
+  
+  "
+result <- dbGetQuery(con, query)
+print(result)
+```
+
+Oblicz średnią wartość długości filmu we wszystkich kategoriach.
+
+```{r}
+  query <- "
+  SELECT 
+  category.name,
+  AVG(film.length)
+  FROM category
+  
+  JOIN film_category ON film_category.category_id = category.category_id
+  JOIN film ON film.film_id = film_category.film_id
+
+  GROUP BY category.name"
+  result <- dbGetQuery(con, query)
+  print(result)
+  
+```
+
+Znajdź najdłuższe tytuły filmowe we wszystkich kategoriach.
+
+```{r}
+query <- "
+SELECT category.name, film.title
+FROM category
+JOIN film_category ON film_category.category_id = category.category_id
+JOIN film ON film_category.film_id = film.film_id
+WHERE (category.category_id, LENGTH(film.title)) IN (
+  SELECT category_id, MAX(LENGTH(title)) AS max_length
+  FROM film
+  JOIN film_category ON film_category.film_id = film.film_id
+  GROUP BY category_id
+);
+"
+  
+result <- dbGetQuery(con, query)
+print(result)
+```
+
+Znajdź najdłuższy film we wszystkich kategoriach. Porównaj wynik z pkt 10.
+
+```{r}
+query <- "
+SELECT category.name, title FROM category
+
+JOIN film_category ON film_category.category_id = category.category_id
+JOIN film ON film_category.film_id = film.film_id
+
+WHERE title IN (
+  SELECT film.title FROM film
+  ORDER BY LENGTH(film.title) DESC
+  LIMIT 1
+  );
+"
+TheLongestMovie <- dbGetQuery(con, query)
+print(TheLongestMovie)
+```
